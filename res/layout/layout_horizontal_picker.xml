@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="48dp" >
+
+    <com.slashg.pickerview.HorizontalScrollViewExt
+        android:id="@+id/number_picker_scroller"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:scrollbars="none" >
+
+        <LinearLayout
+            android:id="@+id/number_picker_items_go_here"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:orientation="horizontal"
+            android:gravity="center" />
+    </com.slashg.pickerview.HorizontalScrollViewExt>
+
+    <View
+        android:id="@+id/number_picker_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:visibility="gone"
+        android:background="@drawable/grad_black_to_transparent" />
+
+    <View
+        android:id="@+id/number_picker_highlight_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="#FA463E" />
+
+    <View
+        android:id="@+id/number_picker_highlight_top"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:background="#FA463E" />
+
+</RelativeLayout>
