@@ -1,5 +1,7 @@
 package com.slashg.pickerview;
 
+import java.awt.font.NumericShaper;
+
 import android.R.color;
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -132,15 +134,13 @@ public class HorizontalNumberPicker extends RelativeLayout implements OnScrollCh
 				if(childWidth > 0)
 				{
 					scrolledItem = 1 + (int) (intScroll / childWidth);
-					if( selectedItem != scrolledItem)
+					if( selectedItem != scrolledItem - 1)
 					{
-						selectedItem = scrolledItem;
+						selectedItem = Math.max(0, (scrolledItem - 1));
 						onTick();
 					}
 				}
 				
-//				if(scroll != null)
-//					scroll.setText(" x = " + x);
 				if(selected != null)
 					selected.setText(" y = " + y);
 			}
@@ -179,17 +179,38 @@ public class HorizontalNumberPicker extends RelativeLayout implements OnScrollCh
 
 		System.out.println("HorizontalNumberPicker::onFinishInflate() childCount = " + getChildCount());
 		int i = 0 ;
+		items = new NumberPickerItem[getChildCount()];
 		while(getChildCount() > 1)
 		{
 			/*
 			 * Loop to move all children to the actual intended container
 			 */
+
 			
-			System.out.println("HorizontalNumberPicker::onFinishInflate() iteration #" + (i++) + " | childCount = " + getChildCount());
 			View temp = getChildAt(1);
+			System.out.println("HorizontalNumberPicker::onFinishInflate() iteration #" + (i+1) + " | childCount = " + getChildCount());
 			removeViewAt(1);
-			container.addView(new NumberPickerItem(getContext(), temp));
+			NumberPickerItem temp2 = new NumberPickerItem(getContext(), temp);
+			items [i++] = temp2;
+			
+			container.addView(temp2);
 		}
+		highlightSelectedItem();
+	}
+	
+	@Override
+	public void addView(View v)
+	{
+		NumberPickerItem[] tempArray = items;
+		items = new NumberPickerItem[items.length + 1];
+		for(int i=0 ; i< tempArray.length ; i++)
+		{
+			items[i] = tempArray[i];
+		}
+		NumberPickerItem temp = new NumberPickerItem(getContext(), v);
+		
+		items[tempArray.length] = temp;
+		container.addView(temp);
 	}
 	
 	public void onTick()
@@ -200,7 +221,36 @@ public class HorizontalNumberPicker extends RelativeLayout implements OnScrollCh
 		 * All actions to be performed on change of selected value should be put here. For example, playing the optional sound
 		 */
 		System.out.println("HorizontalNumberPicker::onTick() Selected value : " + getSelectedIndex());
+		highlightSelectedItem();
 		//playTickSound();
+	}
+	
+	private void highlightSelectedItem()
+	{
+		if(items == null)
+		{
+			System.out.println("HNP::highlightSelectedItem() 'items' is null");
+			return;
+		}
+		for (int i = 0 ; i < items.length ; i++)
+		{
+			NumberPickerItem temp = items[i];
+			if( temp != null)
+			{
+				if(i == getSelectedIndex())
+				{
+					temp.setAlpha(1f);
+				}
+				else
+				{
+					temp.setAlpha(0.5f);
+				}
+			}
+			else
+			{
+				System.out.println("HNP::highlightSelectedItem() picker item at index " + i + " is null");
+			}
+		}
 	}
 	
 	public int getSelectedIndex()
@@ -275,7 +325,7 @@ public class HorizontalNumberPicker extends RelativeLayout implements OnScrollCh
 	
 	private void autoAdjustScroll()
 	{
-		final int expectedScrollX = (getSelectedIndex() - 1) * childWidth;
+		final int expectedScrollX = (getSelectedIndex()) * childWidth;
 		
 		scroller.postDelayed(new Runnable() {
 			
@@ -284,7 +334,7 @@ public class HorizontalNumberPicker extends RelativeLayout implements OnScrollCh
 				scroller.smoothScrollTo(expectedScrollX, 0);
 				scroller.invalidate();
 			}
-		}, 500);
+		}, 200);
 	}
 
 	@Override
@@ -302,7 +352,6 @@ public class HorizontalNumberPicker extends RelativeLayout implements OnScrollCh
 		int halfWidth = fullWidth / 2;										//Calculate center of the scroller
 		int scrollDistance = position * childWidth;
 		int distanceFromCenter = halfWidth - scrollDistance;				//To see how far the view is from the center
-		
 	}
 	
 	public void playTickSound()
